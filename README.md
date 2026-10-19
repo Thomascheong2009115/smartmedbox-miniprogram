@@ -9,6 +9,17 @@
 - 记录与分析：查看历史记录，以图表展示用药情况。
 - 通知页面：集中展示提醒信息。
 
+## 界面展示
+
+<table>
+<tr><th>首页</th><th>药品管理</th><th>亲情语音</th></tr>
+<tr><td><img src="images/home.jpg" width="220" alt="首页：计划与设备状态"></td><td><img src="images/medication.jpg" width="220" alt="药品管理：按时段添加药品"></td><td><img src="images/voice.jpg" width="220" alt="亲情语音：录音与语音库"></td></tr>
+<tr><th>服药记录</th><th>数据分析</th><th></th></tr>
+<tr><td><img src="images/history.jpg" width="220" alt="服药记录与筛选界面"></td><td><img src="images/analysis.jpg" width="220" alt="数据分析演示界面"></td><td></td></tr>
+</table>
+
+首页展示未连接服务时的界面；服药记录与统计包含演示数据，用于展示页面布局和交互。
+
 ## 整体流程
 
 1. 在小程序中录入或修改用药安排。
