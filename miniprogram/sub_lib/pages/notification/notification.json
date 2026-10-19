@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "通知中心",
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "t-icon": "tdesign-miniprogram/icon/icon",
+    "t-badge": "tdesign-miniprogram/badge/badge",
+    "t-dialog": "tdesign-miniprogram/dialog/dialog"
+  }
+}

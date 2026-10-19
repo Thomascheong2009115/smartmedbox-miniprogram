@@ -1,0 +1,22 @@
+node_modules/
+miniprogram_npm/
+project.private.config.json
+__pycache__/
+*.pyc
+.env
+.env.*
+*.log
+*.wav
+*.mp4
+
+# Local credentials and runtime data
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+cloud_config.json
+med_status.json
+runtime_status.json
+upload_records.jsonl
+uploads/

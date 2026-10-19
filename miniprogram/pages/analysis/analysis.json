@@ -1,0 +1,17 @@
+{
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "t-tabs": "tdesign-miniprogram/tabs/tabs",
+    "t-tab-panel": "tdesign-miniprogram/tab-panel/tab-panel",
+    "t-rate": "tdesign-miniprogram/rate/rate",
+    "t-collapse": "tdesign-miniprogram/collapse/collapse",
+    "t-collapse-panel": "tdesign-miniprogram/collapse-panel/collapse-panel",
+    "t-divider": "tdesign-miniprogram/divider/divider",
+    "t-icon": "tdesign-miniprogram/icon/icon",
+    "t-progress": "tdesign-miniprogram/progress/progress",
+    "ec-canvas": "/sub_lib/components/ec-canvas/ec-canvas"
+  },
+  "componentPlaceholder": {
+    "ec-canvas": "view"
+  }
+}

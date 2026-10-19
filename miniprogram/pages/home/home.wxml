@@ -1,0 +1,370 @@
+<view class="page-wrapper">
+  <view class="status-bar-placeholder"></view>
+
+  <!-- 1. Top Header: Title & Date -->
+  <view class="top-header">
+    <text class="main-title">智能藥箱</text>
+    <text class="sub-title">{{dateStr}}</text>
+    
+    <!-- Notification Button -->
+    <view class="notification-btn" bind:tap="goNotification" style="position: absolute; left: 235rpx; top: 38rpx">
+      <t-icon name="notification" size="48rpx" color="#37474F" />
+      <view class="badge-dot" wx:if="{{warningCount > 0}}">{{warningCount}}</view>
+    </view>
+    
+    <!-- Yesterday Missed Banner -->
+    <view class="reminder-banner" wx:if="{{yesterdayMissedText}}">
+       <t-icon name="error-circle" size="32rpx" color="#F9A825" style="margin-right: 8rpx;" />
+       <text>{{yesterdayMissedText}}</text>
+    </view>
+  </view>
+
+  <!-- 2. Info Modules (Greeting & Status) -->
+  <view class="info-modules-grid">
+    <!-- Left: Greeting -->
+    <view class="info-card left-module">
+      <view class="module-icon-wrapper sun-bg">
+        <t-icon name="user" size="40rpx" color="#F9A825" />
+      </view>
+      <view class="module-content">
+        <text class="module-label">問候</text>
+        <text class="module-value">{{greetingText}}</text>
+      </view>
+    </view>
+
+    <!-- Right: Device Status -->
+    <view class="info-card right-module">
+      <view class="module-icon-wrapper {{deviceOnline ? 'green-bg' : 'gray-bg'}}">
+        <t-icon name="{{deviceOnline ? 'wifi' : 'wifi-off'}}" size="40rpx" color="{{deviceOnline ? '#059669' : '#78909C'}}" />
+      </view>
+      <view class="module-content">
+        <text class="module-label">設備狀態</text>
+        <view class="status-row">
+          <view class="status-dot-pulse {{deviceOnline ? 'online' : 'offline'}}"></view>
+          <text class="module-value">{{deviceOnline ? '在線' : '離線'}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 3. Redesigned Hero Card -->
+  <view class="hero-card-new">
+    <view class="hero-title-row">
+      <text class="hero-title">今日用藥</text>
+    </view>
+
+    <view class="hero-stats-row">
+      <!-- Left: Count -->
+      <view class="stats-left">
+        <view class="big-count">
+          <text class="count-current">{{doneCount}}</text>
+          <text class="count-divider">/</text>
+          <text class="count-total">{{totalMedsCount}}</text>
+        </view>
+        <text class="stats-label">已完成劑次</text>
+      </view>
+
+      <!-- Right: Circular Progress -->
+      <view class="stats-right">
+        <view class="progress-ring" style="--percent: {{todayProgress}}%">
+          <view class="progress-ring-inner">
+            <text class="ring-text">{{todayProgress}}%</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- Progress Line -->
+    <view class="hero-progress-line">
+      <view class="progress-line-track">
+        <view class="progress-line-fill" style="width: {{todayProgress}}%;"></view>
+      </view>
+    </view>
+
+    <!-- Next Alarm Info -->
+    <view class="next-alarm-info">
+      <t-icon name="error-circle" size="32rpx" color="#78909C" />
+      <text class="next-alarm-text">下一次服藥：{{nextAlarmText}}</text>
+    </view>
+  </view>
+
+  <!-- Main Content (Med Grid) -->
+  <view class="main-content">
+    <view class="section-header">
+      <text class="section-title">用藥詳情</text>
+    </view>
+
+    <view class="med-grid">
+      <!-- Morning Card -->
+      <view class="compartment-card {{morningTheme}}">
+        <view class="card-header">
+          <text class="period-tag">上午</text>
+          <view class="check-icon" wx:if="{{morningDone}}">
+            <t-icon name="check" size="32rpx" color="#FFFFFF" />
+          </view>
+        </view>
+        
+        <view class="card-body">
+          <text class="drug-name">{{alarms.morning.name}}</text>
+        </view>
+
+        <view class="card-footer">
+          <view class="time-wrapper">
+             <text class="med-prefix" wx:if="{{alarms.morning.prefix}}">{{alarms.morning.prefix}}</text>
+             <text class="med-time" wx:if="{{alarms.morning.name !== '暫無藥品'}}">{{alarms.morning.time}}</text>
+          </view>
+          <view class="status-text {{morningTheme}}">{{morningLabel}}</view>
+        </view>
+      </view>
+
+      <!-- Noon Card -->
+      <view class="compartment-card {{noonTheme}}">
+        <view class="card-header">
+          <text class="period-tag">中午</text>
+          <view class="check-icon" wx:if="{{noonDone}}">
+            <t-icon name="check" size="32rpx" color="#FFFFFF" />
+          </view>
+        </view>
+        
+        <view class="card-body">
+          <text class="drug-name">{{alarms.noon.name}}</text>
+        </view>
+
+        <view class="card-footer">
+          <view class="time-wrapper">
+             <text class="med-prefix" wx:if="{{alarms.noon.prefix}}">{{alarms.noon.prefix}}</text>
+             <text class="med-time" wx:if="{{alarms.noon.name !== '暫無藥品'}}">{{alarms.noon.time}}</text>
+          </view>
+          <view class="status-text {{noonTheme}}">{{noonLabel}}</view>
+        </view>
+      </view>
+
+      <!-- Afternoon Card -->
+      <view class="compartment-card {{afternoonTheme}}">
+        <view class="card-header">
+          <text class="period-tag">下午</text>
+          <view class="check-icon" wx:if="{{afternoonDone}}">
+            <t-icon name="check" size="32rpx" color="#FFFFFF" />
+          </view>
+        </view>
+        
+        <view class="card-body">
+          <text class="drug-name">{{alarms.afternoon.name}}</text>
+        </view>
+
+        <view class="card-footer">
+          <view class="time-wrapper">
+             <text class="med-prefix" wx:if="{{alarms.afternoon.prefix}}">{{alarms.afternoon.prefix}}</text>
+             <text class="med-time" wx:if="{{alarms.afternoon.name !== '暫無藥品'}}">{{alarms.afternoon.time}}</text>
+          </view>
+          <view class="status-text {{afternoonTheme}}">{{afternoonLabel}}</view>
+        </view>
+      </view>
+
+      <!-- Evening Card -->
+      <view class="compartment-card {{eveningTheme}}">
+        <view class="card-header">
+          <text class="period-tag">晚間</text>
+          <view class="check-icon" wx:if="{{eveningDone}}">
+            <t-icon name="check" size="32rpx" color="#FFFFFF" />
+          </view>
+        </view>
+        
+        <view class="card-body">
+          <text class="drug-name">{{alarms.evening.name}}</text>
+        </view>
+
+        <view class="card-footer">
+          <view class="time-wrapper">
+             <text class="med-prefix" wx:if="{{alarms.evening.prefix}}">{{alarms.evening.prefix}}</text>
+             <text class="med-time" wx:if="{{alarms.evening.name !== '暫無藥品'}}">{{alarms.evening.time}}</text>
+          </view>
+          <view class="status-text {{eveningTheme}}">{{eveningLabel}}</view>
+        </view>
+      </view>
+    </view>
+    
+    <view class="section-header" style="margin-top: 48rpx;">
+      <text class="section-title">昨日用藥</text>
+    </view>
+
+    <view class="med-grid">
+      <!-- Yesterday Morning Card -->
+      <view class="compartment-card {{yesterdayMorningTheme}}">
+        <view class="card-header">
+          <text class="period-tag">上午</text>
+          <view class="check-icon" wx:if="{{yesterdayMorningDone}}">
+            <t-icon name="check" size="32rpx" color="#FFFFFF" />
+          </view>
+        </view>
+        
+        <view class="card-body">
+          <text class="drug-name">{{yesterdayAlarms.morning.name}}</text>
+        </view>
+
+        <view class="card-footer">
+          <view class="time-wrapper">
+             <text class="med-prefix" wx:if="{{yesterdayAlarms.morning.prefix}}">{{yesterdayAlarms.morning.prefix}}</text>
+             <text class="med-time" wx:if="{{yesterdayAlarms.morning.name !== '暫無藥品' && yesterdayAlarms.morning.name !== '昨日無藥'}}">{{yesterdayAlarms.morning.time}}</text>
+          </view>
+          <view class="status-text {{yesterdayMorningTheme}}">{{yesterdayMorningLabel}}</view>
+        </view>
+      </view>
+
+      <!-- Yesterday Noon Card -->
+      <view class="compartment-card {{yesterdayNoonTheme}}">
+        <view class="card-header">
+          <text class="period-tag">中午</text>
+          <view class="check-icon" wx:if="{{yesterdayNoonDone}}">
+            <t-icon name="check" size="32rpx" color="#FFFFFF" />
+          </view>
+        </view>
+        
+        <view class="card-body">
+          <text class="drug-name">{{yesterdayAlarms.noon.name}}</text>
+        </view>
+
+        <view class="card-footer">
+          <view class="time-wrapper">
+             <text class="med-prefix" wx:if="{{yesterdayAlarms.noon.prefix}}">{{yesterdayAlarms.noon.prefix}}</text>
+             <text class="med-time" wx:if="{{yesterdayAlarms.noon.name !== '暫無藥品' && yesterdayAlarms.noon.name !== '昨日無藥'}}">{{yesterdayAlarms.noon.time}}</text>
+          </view>
+          <view class="status-text {{yesterdayNoonTheme}}">{{yesterdayNoonLabel}}</view>
+        </view>
+      </view>
+
+      <!-- Yesterday Afternoon Card -->
+      <view class="compartment-card {{yesterdayAfternoonTheme}}">
+        <view class="card-header">
+          <text class="period-tag">下午</text>
+          <view class="check-icon" wx:if="{{yesterdayAfternoonDone}}">
+            <t-icon name="check" size="32rpx" color="#FFFFFF" />
+          </view>
+        </view>
+        
+        <view class="card-body">
+          <text class="drug-name">{{yesterdayAlarms.afternoon.name}}</text>
+        </view>
+
+        <view class="card-footer">
+          <view class="time-wrapper">
+             <text class="med-prefix" wx:if="{{yesterdayAlarms.afternoon.prefix}}">{{yesterdayAlarms.afternoon.prefix}}</text>
+             <text class="med-time" wx:if="{{yesterdayAlarms.afternoon.name !== '暫無藥品' && yesterdayAlarms.afternoon.name !== '昨日無藥'}}">{{yesterdayAlarms.afternoon.time}}</text>
+          </view>
+          <view class="status-text {{yesterdayAfternoonTheme}}">{{yesterdayAfternoonLabel}}</view>
+        </view>
+      </view>
+
+      <!-- Yesterday Evening Card -->
+      <view class="compartment-card {{yesterdayEveningTheme}}">
+        <view class="card-header">
+          <text class="period-tag">晚間</text>
+          <view class="check-icon" wx:if="{{yesterdayEveningDone}}">
+            <t-icon name="check" size="32rpx" color="#FFFFFF" />
+          </view>
+        </view>
+        
+        <view class="card-body">
+          <text class="drug-name">{{yesterdayAlarms.evening.name}}</text>
+        </view>
+
+        <view class="card-footer">
+          <view class="time-wrapper">
+             <text class="med-prefix" wx:if="{{yesterdayAlarms.evening.prefix}}">{{yesterdayAlarms.evening.prefix}}</text>
+             <text class="med-time" wx:if="{{yesterdayAlarms.evening.name !== '暫無藥品' && yesterdayAlarms.evening.name !== '昨日無藥'}}">{{yesterdayAlarms.evening.time}}</text>
+          </view>
+          <view class="status-text {{yesterdayEveningTheme}}">{{yesterdayEveningLabel}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- Quick Actions (2 Items) - Removed -->
+  </view>
+
+  <!-- Modals -->
+  <!-- Voice Confirm Modal -->
+  <view class="custom-modal-mask" wx:if="{{showConfirmModal}}" bind:tap="onCancelVoice">
+    <view class="custom-modal-card" catch:tap="doNothing">
+      <view class="modal-header-icon success">
+        <t-icon name="check-circle" size="48rpx" color="#FFFFFF" />
+      </view>
+      <text class="modal-title">識別結果</text>
+      <text class="modal-content">{{finalText}}</text>
+      <view class="modal-footer">
+        <view class="modal-btn cancel" bind:tap="onCancelVoice">取消</view>
+        <view class="modal-btn confirm" bind:tap="onConfirmVoice">確認保存</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Schedule Modal -->
+  <view class="custom-modal-mask" wx:if="{{showScheduleModal}}" bind:tap="onCancelSchedule">
+    <view class="custom-modal-card wide" catch:tap="doNothing">
+      <view class="modal-header-row">
+        <text class="modal-title-lg">AI 智能排班</text>
+        <text class="modal-subtitle">點擊下方欄位可修改</text>
+      </view>
+
+      <view class="schedule-list">
+        <view class="schedule-item" wx:for="{{parsedSchedules}}" wx:key="index">
+          <view class="schedule-row-top">
+             <view class="badge-gray">{{item.gridNumber}}格</view>
+             
+             <!-- Date Picker -->
+             <picker mode="date" value="{{item.startDate}}" start="2025-01-01" bindchange="onEditScheduleDate" data-idx="{{index}}">
+                <view class="picker-tag">{{item.startDateStr || '日期'}} ▾</view>
+             </picker>
+
+             <view class="picker-tag {{item.period === '早上' ? 'morning' : item.period === '中午' ? 'noon' : 'evening'}}"
+                   bind:tap="onEditSchedulePeriod" data-idx="{{index}}">
+               {{item.period}} ▾
+             </view>
+             
+             <view class="picker-tag" bind:tap="onEditScheduleFreq" data-idx="{{index}}">
+               {{item.frequencyLabel}} ▾
+             </view>
+
+             <!-- Time Picker -->
+             <picker mode="time" value="{{item.timeStr}}" bindchange="onEditScheduleTimePicker" data-idx="{{index}}">
+               <view class="time-edit">
+                 {{item.timeStr}} <t-icon name="edit-1" size="20rpx" />
+               </view>
+             </picker>
+          </view>
+          
+          <view class="schedule-row-bottom">
+            <input class="input-underline" value="{{item.drug_name}}"
+                   bindinput="onEditDrugName" data-idx="{{index}}" placeholder="藥品名稱" />
+            <input class="input-underline short" value="{{item.dose}}"
+                   bindinput="onEditDose" data-idx="{{index}}" placeholder="劑量" />
+          </view>
+        </view>
+      </view>
+
+      <view class="modal-footer">
+        <view class="modal-btn cancel" bind:tap="onCancelSchedule">暫不設置</view>
+        <view class="modal-btn confirm" bind:tap="onConfirmSchedule">確認排班</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Follow Up Modal -->
+  <view class="custom-modal-mask" wx:if="{{showFollowUpModal}}">
+    <view class="custom-modal-card" catch:tap="doNothing">
+      <view class="modal-header-icon question">
+        <t-icon name="chat" size="48rpx" color="#FFFFFF" />
+      </view>
+      <text class="modal-title">需要確認</text>
+      <text class="modal-content">{{followUpQuestion}}</text>
+      
+      <input class="modal-input" placeholder="例如：兩粒、一片..." 
+             value="{{followUpAnswer}}" bindinput="onFollowUpInput" 
+             bindconfirm="onFollowUpConfirm" focus="{{showFollowUpModal}}" />
+             
+      <view class="modal-footer">
+        <view class="modal-btn cancel" bind:tap="onFollowUpSkip">跳過</view>
+        <view class="modal-btn confirm" bind:tap="onFollowUpConfirm">確認</view>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,54 @@
+<view class="tab-bar">
+  <!-- 首页 -->
+  <navigator url="/pages/home/home" open-type="switchTab" class="tab-item {{selected === '0' ? 'tab-item--active' : ''}}" hover-class="none">
+    <view class="icon-wrap {{selected === '0' ? 'icon-wrap--active' : ''}}">
+      <view class="icon-box">
+        <!-- ★ 原来是 <t-icon name="home"> -->
+        <image class="tab-svg-icon" src="/assets/icons/home{{selected === '0' ? '-active' : ''}}.svg" mode="aspectFit" />
+      </view>
+    </view>
+    <text class="tab-text {{selected === '0' ? 'active-text' : ''}}">首頁</text>
+  </navigator>
+
+  <!-- 药盒 -->
+  <navigator url="/pages/med-manage/med-manage" open-type="switchTab" class="tab-item {{selected === '1' ? 'tab-item--active' : ''}}" hover-class="none">
+    <view class="icon-wrap {{selected === '1' ? 'icon-wrap--active' : ''}}">
+      <view class="icon-box">
+        <!-- ★ 原来是 <t-icon name="edit-1"> -->
+        <image class="tab-svg-icon" src="/assets/icons/pill{{selected === '1' ? '-active' : ''}}.svg" mode="aspectFit" />
+      </view>
+    </view>
+    <text class="tab-text {{selected === '1' ? 'active-text' : ''}}">藥盒</text>
+  </navigator>
+
+  <!-- 语音（中央凸起） -->
+  <navigator url="/pages/voice-recorder/voice-recorder" open-type="switchTab" class="tab-item center-wrapper mic-wrapper {{selected === '2' ? 'tab-item--active' : ''}}" hover-class="none">
+    <view class="tab-voice-btn {{selected === '2' ? 'center-circle--active' : ''}}">
+      <!-- ★ 原来是 <t-icon name="microphone"> -->
+      <image style="width: 110rpx; height: 58rpx; display: block; box-sizing: border-box" class="tab-mic-svg" src="/assets/icons/mic-bar.svg" mode="aspectFit" />
+    </view>
+    <text class="tab-text {{selected === '2' ? 'active-text' : ''}}">語音助手</text>
+  </navigator>
+
+  <!-- 分析 -->
+  <navigator url="/pages/analysis/analysis" open-type="switchTab" class="tab-item {{selected === '3' ? 'tab-item--active' : ''}}" hover-class="none">
+    <view class="icon-wrap {{selected === '3' ? 'icon-wrap--active' : ''}}">
+      <view class="icon-box">
+        <!-- ★ 原来是 <t-icon name="chart-bar"> -->
+        <image class="tab-svg-icon" src="/assets/icons/chart{{selected === '3' ? '-active' : ''}}.svg" mode="aspectFit" />
+      </view>
+    </view>
+    <text class="tab-text {{selected === '3' ? 'active-text' : ''}}">分析</text>
+  </navigator>
+
+  <!-- 记录 -->
+  <navigator url="/pages/history/history" open-type="switchTab" class="tab-item {{selected === '4' ? 'tab-item--active' : ''}}" hover-class="none">
+    <view class="icon-wrap {{selected === '4' ? 'icon-wrap--active' : ''}}">
+      <view class="icon-box">
+        <!-- ★ 原来是 <t-icon name="user"> -->
+        <image class="tab-svg-icon" src="/assets/icons/user{{selected === '4' ? '-active' : ''}}.svg" mode="aspectFit" />
+      </view>
+    </view>
+    <text class="tab-text {{selected === '4' ? 'active-text' : ''}}">記錄</text>
+  </navigator>
+</view>

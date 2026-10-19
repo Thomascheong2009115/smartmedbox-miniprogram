@@ -1,0 +1,173 @@
+/* pages/notification/notification.wxss */
+page {
+  background: var(--bg-page);
+}
+
+/* ===== Header (Smart Box Pro) ===== */
+.immersive-header {
+  background: var(--grad-header);
+  position: relative;
+}
+
+.status-bar-placeholder {
+  height: calc(env(safe-area-inset-top, 20px) + 8px);
+  min-height: 48px;
+}
+
+.custom-nav-row {
+  display: flex;
+  align-items: center;
+  padding: 12rpx 24rpx;
+  height: 88rpx;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.nav-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #333333;
+  letter-spacing: 2rpx;
+}
+
+.header-curve {
+  height: 32rpx;
+  background: var(--bg-page);
+  border-radius: 32rpx 32rpx 0 0;
+}
+
+.page-container {
+  padding: 0 32rpx 280rpx;
+  box-sizing: border-box;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+  padding: 32rpx 0 24rpx;
+}
+
+/* ===== Warning Card ===== */
+.warning-card {
+  background: var(--bg-card);
+  border-radius: 24rpx;
+  padding: 24rpx;
+  display: flex;
+  align-items: flex-start;
+  gap: 24rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 8rpx 24rpx rgba(15, 23, 42, 0.04);
+  position: relative;
+  transition: all 0.3s;
+}
+
+.warning-card:active {
+  background: var(--bg-card-soft);
+}
+
+.warning-card--unread {
+  border-left: 8rpx solid var(--brand-light);
+}
+
+.warning-card--read {
+  border-left: 8rpx solid var(--text-quaternary);
+  opacity: 0.8;
+  padding-right: 12rpx; /* 為刪除按鈕留空間 */
+}
+
+.delete-btn {
+  padding: 12rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 8rpx;
+}
+
+
+.warning-icon-wrap {
+  position: relative;
+  margin-top: 4rpx;
+}
+
+.unread-dot {
+  position: absolute;
+  top: -4rpx;
+  right: -4rpx;
+  width: 16rpx;
+  height: 16rpx;
+  background: var(--brand-light);
+  border: 2rpx solid var(--bg-card);
+  border-radius: 50%;
+}
+
+.warning-content {
+  flex: 1;
+}
+
+.warning-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8rpx;
+}
+
+.warning-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.warning-time {
+  font-size: 22rpx;
+  color: var(--text-tertiary);
+}
+
+.warning-desc {
+  font-size: 28rpx;
+  color: #444;
+  margin-bottom: 12rpx;
+  line-height: 1.5;
+}
+
+.warning-hint {
+  font-size: 22rpx;
+  color: #6EAFF8;
+  font-weight: 500;
+  text-align: right;
+}
+
+.warning-card--read .warning-title,
+.warning-card--read .warning-desc {
+  color: #8E99A4;
+}
+
+/* ===== Empty State ===== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60rpx 0;
+  gap: 24rpx;
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  margin-bottom: 24rpx;
+}
+
+.empty-state-small {
+  text-align: center;
+  padding: 32rpx;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: #8E99A4;
+}

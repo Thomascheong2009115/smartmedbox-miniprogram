@@ -1,0 +1,189 @@
+
+<view class="immersive-header">
+  <view class="status-bar-placeholder"></view>
+  <view class="custom-nav-row">
+    <text class="nav-title">藥品管理</text>
+  </view>
+  <view class="header-curve"></view>
+</view>
+
+<view class="page-container">
+  <!-- Year Picker -->
+  <view class="year-picker-container">
+     <picker mode="selector" range="{{yearRange}}" bindchange="onYearChange">
+        <view class="year-picker-btn">
+            <text>{{currentYear}}年</text>
+            <t-icon name="caret-down-small" size="32rpx" color="#6EAFF8" />
+        </view>
+    </picker>
+  </view>
+
+  <!-- 藥箱配置 - 早上 -->
+  <view class="period-section">
+    
+    <view class="med-grid">
+      <template is="grid-items" data="{{meds: morningMeds, period: 'morning'}}" />
+    </view>
+  </view>
+
+  <!-- 藥箱配置 - 中午 -->
+  <view class="period-section">
+    
+    <view class="med-grid">
+      <template is="grid-items" data="{{meds: noonMeds, period: 'noon'}}" />
+    </view>
+  </view>
+
+  <!-- 藥箱配置 - 晚上 -->
+  <view class="period-section">
+    
+    <view class="med-grid">
+      <template is="grid-items" data="{{meds: eveningMeds, period: 'evening'}}" />
+    </view>
+  </view>
+
+  <!-- Grid Item Template -->
+  <template name="grid-items">
+    <view
+      class="med-slot {{item.name ? '' : 'med-slot--empty'}}"
+      wx:for="{{meds}}"
+      wx:key="index"
+      bind:tap="onMedTap"
+      data-period="{{period}}"
+      data-index="{{index}}"
+    >
+      <block wx:if="{{item.name}}">
+        <view class="med-slot-header">
+          <!-- 藥品名稱 -->
+          <view class="med-name-row">
+             <t-icon name="capsule" size="32rpx" color="#0052D9" />
+             <text class="med-name">{{item.drugName}}</text>
+          </view>
+          
+          <!-- 劑量 -->
+          <view class="med-dose-tag" wx:if="{{item.dose}}">
+             <text>{{item.dose}}</text>
+          </view>
+        </view>
+        
+        <!-- 時間與日期信息 -->
+        <view class="med-info-block">
+            <view class="info-row">
+                <t-icon name="time" size="24rpx" color="#64748B"/>
+                <text>{{item.scheduleTime || '--:--'}}</text>
+            </view>
+            <view class="info-row">
+                <t-icon name="calendar" size="24rpx" color="#64748B"/>
+                <text>{{item.dateLabel || '日期'}}</text>
+            </view>
+            <view class="info-row">
+                <t-icon name="refresh" size="24rpx" color="#64748B"/>
+                <text>{{item.frequency === 'once' ? '單次' : '每日'}}</text>
+            </view>
+        </view>
+
+        <!-- 補充按鈕 -->
+        <t-button
+          wx:if="{{item.remaining <= 2}}"
+          theme="danger" size="extra-small" shape="round"
+          catch:tap="onRefill"
+          data-period="{{period}}" data-index="{{index}}"
+          class="refill-btn"
+        >補充 ({{item.remaining}}/7)</t-button>
+        <view wx:else class="stock-text">庫存: {{item.remaining}}/7</view>
+
+      </block>
+      <block wx:else>
+        <view class="add-icon-circle">
+            <t-icon name="add" size="48rpx" color="#FFFFFF" />
+        </view>
+        <text class="med-add-hint">添加藥品</text>
+      </block>
+    </view>
+  </template>
+</view>
+
+<!-- 詳細添加/編輯彈窗 -->
+<t-dialog
+  visible="{{showEditDialog}}"
+  title="{{isEditing ? '編輯藥品' : '添加藥品'}}"
+  confirm-btn="保存"
+  cancel-btn="取消"
+  bind:confirm="onEditConfirm"
+  bind:cancel="onEditCancel"
+  close-on-overlay-click="{{false}}"
+>
+  <view slot="content" class="edit-form">
+    <!-- 藥名 -->
+    <view class="form-item">
+        <text class="form-label">藥品名稱</text>
+        <t-input
+            placeholder="例如：阿司匹林"
+            value="{{tempDrugName}}"
+            bind:change="onDrugNameChange"
+            borderless="{{true}}"
+            class="custom-input"
+        />
+    </view>
+    
+    <!-- 劑量 -->
+    <view class="form-item">
+        <text class="form-label">單次劑量</text>
+        <t-input
+            placeholder="例如：1粒"
+            value="{{tempDose}}"
+            bind:change="onDoseChange"
+            borderless="{{true}}"
+            class="custom-input"
+        />
+    </view>
+
+    <!-- 時間 -->
+    <view class="form-item">
+        <text class="form-label">服藥時間</text>
+        <picker mode="time" value="{{tempTime}}" bindchange="onTimeChange">
+            <view class="picker-display">
+                <text>{{tempTime || '請選擇'}}</text>
+                <t-icon name="chevron-right" size="32rpx" color="#C0C4CC"/>
+            </view>
+        </picker>
+    </view>
+
+    <!-- 日期 -->
+    <view class="form-item">
+        <text class="form-label">開始日期</text>
+        <picker mode="date" value="{{tempDate}}" start="2025-01-01" bindchange="onDateChange">
+            <view class="picker-display">
+                <text>{{tempDate || '請選擇'}}</text>
+                <t-icon name="chevron-right" size="32rpx" color="#C0C4CC"/>
+            </view>
+        </picker>
+    </view>
+
+    <!-- 頻率 -->
+    <view class="form-item">
+        <text class="form-label">服藥頻率</text>
+        <view class="freq-options">
+            <view 
+                class="freq-chip {{tempFrequency === 'daily' ? 'active' : ''}}" 
+                bind:tap="onFreqChange" 
+                data-value="daily"
+            >每日</view>
+            <view 
+                class="freq-chip {{tempFrequency === 'once' ? 'active' : ''}}" 
+                bind:tap="onFreqChange" 
+                data-value="once"
+            >單次</view>
+        </view>
+    </view>
+
+    <view class="form-hint" wx:if="{{!isEditing}}">
+        <t-icon name="info-circle" size="24rpx" />
+        <text>手動添加將自動分配到當前空閒藥格</text>
+    </view>
+    
+    <view class="delete-btn-wrap" wx:if="{{isEditing}}">
+        <t-button theme="light" variant="text" size="small" bind:tap="onClearSlot" style="color: #D54941;">清空此藥格</t-button>
+    </view>
+  </view>
+</t-dialog>

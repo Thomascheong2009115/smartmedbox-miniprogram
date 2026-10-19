@@ -1,0 +1,170 @@
+<view class="history-page">
+  <view class="ambient-glow glow-1"></view>
+  <view class="ambient-glow glow-2"></view>
+
+  <view class="immersive-header">
+    <view class="status-bar-placeholder"></view>
+    <view class="nav-bar">
+      <view class="nav-left"></view>
+      <text class="nav-title">服藥記錄</text>
+      <view class="nav-right"></view>
+    </view>
+    <view class="header-stats-panel">
+      <view class="header-stats">
+        <view class="stat-pill">
+          <text class="stat-pill-num">{{records.length}}</text>
+          <text class="stat-pill-label">總筆數</text>
+        </view>
+        <view class="stat-divider"></view>
+        <view class="stat-pill">
+          <text class="stat-pill-num stat-pill-num--success">{{completedCount}}</text>
+          <text class="stat-pill-label">已完成</text>
+        </view>
+        <view class="stat-divider"></view>
+        <view class="stat-pill">
+          <text class="stat-pill-num stat-pill-num--danger">{{missedCount}}</text>
+          <text class="stat-pill-label">漏服</text>
+        </view>
+      </view>
+    </view>
+    <view class="header-curve"></view>
+  </view>
+
+  <view class="filter-bar">
+    <view class="filter-header">
+      <text class="filter-title">篩選</text>
+      <text class="filter-tip">快速定位記錄</text>
+    </view>
+    <view class="filter-chips grid-12">
+      <view
+        class="filter-chip chip col-span-3 {{filterDate === 'today' ? 'filter-chip--active' : ''}}"
+        bind:tap="onDateFilter"
+        data-value="today"
+      >今日</view>
+      <view
+        class="filter-chip chip col-span-3 {{filterDate === 'week' ? 'filter-chip--active' : ''}}"
+        bind:tap="onDateFilter"
+        data-value="week"
+      >近7天</view>
+      <view
+        class="filter-chip chip col-span-3 {{filterDate === 'month' ? 'filter-chip--active' : ''}}"
+        bind:tap="onDateFilter"
+        data-value="month"
+      >近30天</view>
+      <view
+        class="filter-chip chip col-span-3 {{filterDate === 'all' ? 'filter-chip--active' : ''}}"
+        bind:tap="onDateFilter"
+        data-value="all"
+      >全部</view>
+    </view>
+
+    <view class="filter-status grid-12">
+      <view
+        class="status-chip chip col-span-4 {{filterStatus === 'all' ? 'status-chip--active' : ''}}"
+        bind:tap="onStatusFilter"
+        data-value="all"
+      >
+        <t-icon class="chip-icon" name="filter" size="28rpx" />
+        <text>全部</text>
+      </view>
+      <view
+        class="status-chip status-chip--success chip col-span-4 {{filterStatus === 'completed' ? 'status-chip--active' : ''}}"
+        bind:tap="onStatusFilter"
+        data-value="completed"
+      >
+        <t-icon class="chip-icon" name="check-circle" size="28rpx" />
+        <text>完成</text>
+      </view>
+      <view
+        class="status-chip status-chip--danger chip col-span-4 {{filterStatus === 'missed' ? 'status-chip--active' : ''}}"
+        bind:tap="onStatusFilter"
+        data-value="missed"
+      >
+        <t-icon class="chip-icon" name="close-circle" size="28rpx" />
+        <text>漏服</text>
+      </view>
+    </view>
+  </view>
+
+  <scroll-view
+    scroll-y
+    class="records-scroll"
+    enable-back-to-top
+    refresher-enabled
+    bindrefresherrefresh="onPullDownRefresh"
+  >
+    <view class="records-list slide-up" wx:if="{{records.length > 0}}">
+      <view class="td-card record-card" wx:for="{{records}}" wx:key="id">
+        <view class="card-sheen"></view>
+        <view class="record-top">
+          <view class="record-time-col">
+            <text class="record-time-text">{{item.time}}</text>
+            <text class="record-date-text">{{item.date}}</text>
+          </view>
+          <view class="record-badges">
+            <t-tag class="period-tag" variant="light" size="small" theme="primary">{{item.period}}</t-tag>
+            <view class="status-tag status-tag--{{item.status === 'completed' ? 'success' : 'danger'}}">
+              {{item.status === 'completed' ? '完成' : '漏服'}}
+            </view>
+          </view>
+        </view>
+
+        <view class="record-indicator {{item.status === 'completed' ? 'indicator--success' : 'indicator--danger'}}"></view>
+
+        <view class="ai-block">
+          <view class="ai-header-row">
+            <t-icon class="ai-icon" name="system-log" size="32rpx" color="var(--brand-primary)" />
+            <text class="ai-label-text">AI 分析結果</text>
+            <text class="check-count-text">檢測 {{item.checkCount}} 次</text>
+          </view>
+
+          <view class="ai-result-row">
+            <t-icon
+              class="ai-status-icon"
+              name="{{item.status === 'completed' ? 'check-circle-filled' : 'close-circle-filled'}}"
+              size="36rpx"
+              color="{{item.status === 'completed' ? 'var(--color-success)' : 'var(--color-danger)'}}"
+            />
+            <text class="ai-result-text">
+              {{item.status === 'completed' ? '檢測到正常服藥行為，本次記錄正常。' : '未檢測到有效服藥行為，請確認是否漏服。'}}
+            </text>
+          </view>
+
+          <view
+            class="photo-btn"
+            wx:if="{{item.hasImage}}"
+            bind:tap="viewImage"
+            data-image="{{item.imageBase64}}"
+          >
+            <t-icon name="browse" size="32rpx" color="var(--brand-primary)" />
+            <text class="photo-btn-text">查看拍照記錄</text>
+            <t-icon name="chevron-right" size="28rpx" color="var(--text-tertiary)" />
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="empty-wrap fade-in" wx:else>
+      <t-empty icon="file" description="目前沒有服藥記錄" />
+      <text class="empty-hint">完成一次服藥後，系統會在這裡顯示歷史資料。</text>
+    </view>
+  </scroll-view>
+</view>
+
+<view class="image-modal" wx:if="{{showImageModal}}" bindtap="closeImageModal">
+  <view class="modal-content" catchtap="doNothing">
+    <view class="modal-header">
+      <view class="modal-title-row">
+        <t-icon class="modal-icon" name="browse" size="36rpx" color="var(--brand-primary)" />
+        <text class="modal-title">AI 拍照紀錄</text>
+      </view>
+      <view class="modal-close" bindtap="closeImageModal">
+        <t-icon name="close" size="36rpx" color="var(--text-secondary)" />
+      </view>
+    </view>
+    <image class="preview-image" src="{{currentImage}}" mode="aspectFit" />
+    <view class="modal-footer">
+      <text class="modal-footer-text">照片由 K10 裝置上傳，用於 AI 判讀輔助。</text>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,55 @@
+{
+  "pages": [
+    "pages/home/home",
+    "pages/med-manage/med-manage",
+    "pages/history/history",
+    "pages/analysis/analysis",
+    "pages/voice-recorder/voice-recorder"
+  ],
+  "subPackages": [
+    {
+      "root": "sub_lib",
+      "pages": [
+        "pages/notification/notification"
+      ]
+    }
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTitleText": "智能藥箱",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#ECEEF1"
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#8E99A4",
+    "selectedColor": "#6EAFF8",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/home/home",
+        "text": "首頁"
+      },
+      {
+        "pagePath": "pages/med-manage/med-manage",
+        "text": "藥品管理"
+      },
+      {
+        "pagePath": "pages/voice-recorder/voice-recorder",
+        "text": "錄音"
+      },
+      {
+        "pagePath": "pages/analysis/analysis",
+        "text": "數據分析"
+      },
+      {
+        "pagePath": "pages/history/history",
+        "text": "記錄"
+      }
+    ]
+  },
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

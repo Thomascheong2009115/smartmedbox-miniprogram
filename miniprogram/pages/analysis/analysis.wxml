@@ -1,0 +1,240 @@
+<view class="analysis-page">
+  <view class="immersive-header">
+    <view class="status-bar-placeholder"></view>
+    <view class="custom-nav-row">
+      <text class="nav-title">數據分析</text>
+    </view>
+    <view class="header-curve"></view>
+  </view>
+
+  <view class="analysis-content">
+    <view class="mode-card">
+      <t-tabs value="{{mode}}" bind:change="onModeChange" theme="tag" space-evenly>
+        <t-tab-panel label="示範模式" value="demo" />
+        <t-tab-panel label="真實模式" value="real" />
+      </t-tabs>
+    </view>
+
+    <view class="month-card" bind:tap="openMonthPicker">
+      <view class="month-left">
+        <t-icon name="calendar" size="34rpx" color="#6AA9F5" />
+        <text class="month-text">報告月份：{{currentYear}}/{{currentMonth}}</text>
+      </view>
+      <t-icon name="chevron-down" size="30rpx" color="#6B7280" />
+    </view>
+
+    <view class="td-card score-card">
+      <view class="score-header">
+        <view class="score-header-left">
+          <text class="score-title">依從分數</text>
+          <text class="score-subtitle">服藥一致性概覽</text>
+        </view>
+        <view class="score-badge-small">
+          {{statistics.adherenceScore}}<text class="score-unit">/100</text>
+        </view>
+      </view>
+
+      <view class="score-main-row">
+        <view class="ring-wrap">
+          <t-progress
+            theme="circle"
+            label="{{false}}"
+            percentage="{{statistics.adherenceScore}}"
+            stroke-width="10rpx"
+            color="linear-gradient(135deg, #38BDF8, #2563EB)"
+            track-color="#E5EDFF"
+            size="168rpx"
+          />
+          <view class="ring-label">
+            <text class="score-circle-value">{{statistics.adherenceScore}}%</text>
+            <text class="score-circle-caption">依從率</text>
+          </view>
+        </view>
+
+        <view class="score-meta">
+          <view class="score-meta-row">
+            <text class="score-meta-label">等級</text>
+            <text class="score-meta-value">{{scoreLevel}}</text>
+          </view>
+          <view class="score-meta-row">
+            <text class="score-meta-label">星級評分</text>
+            <view class="score-stars">
+              <t-rate value="{{starCount}}" count="5" size="40rpx" disabled />
+            </view>
+          </view>
+          <view class="score-meta-row">
+            <text class="score-meta-label">完成率</text>
+            <text class="score-meta-value-strong">{{statistics.completionRate}}%</text>
+          </view>
+          <view class="score-meta-row muted">
+            <text class="score-meta-caption">依本月服藥紀錄計算</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="stats-grid">
+      <view class="td-card stat-box">
+        <t-icon name="check-circle-filled" size="48rpx" color="#10B981" />
+        <view class="stat-num stat-num--success">{{statistics.completed}}</view>
+        <view class="stat-label">已完成</view>
+        <view class="stat-sub">{{statistics.completionRate}}%</view>
+      </view>
+      <view class="td-card stat-box">
+        <t-icon name="time-filled" size="48rpx" color="#F59E0B" />
+        <view class="stat-num stat-num--warning">{{statistics.delayed}}</view>
+        <view class="stat-label">延遲</view>
+        <view class="stat-sub">平均 {{statistics.avgDelay}} 分鐘</view>
+      </view>
+      <view class="td-card stat-box">
+        <t-icon name="close-circle-filled" size="48rpx" color="#F43F5E" />
+        <view class="stat-num stat-num--danger">{{statistics.missed}}</view>
+        <view class="stat-label">漏服</view>
+        <view class="stat-sub">{{statistics.missedRate}}%</view>
+      </view>
+      <view class="td-card stat-box">
+        <t-icon name="chart-bar" size="48rpx" color="#3B82F6" />
+        <view class="stat-num stat-num--info">{{statistics.total}}</view>
+        <view class="stat-label">總次數</view>
+        <view class="stat-sub">本月</view>
+      </view>
+    </view>
+
+    <view class="td-card chart-card">
+      <view class="chart-header">
+        <view class="chart-title">每週依從率</view>
+        <view class="chart-subtitle">平滑趨勢與漸變填充</view>
+      </view>
+      <view class="chart-wrap">
+        <ec-canvas
+          id="dailyChart"
+          canvas-id="dailyChart"
+          ec="{{dailyChart}}"
+          force-use-old-canvas="{{true}}"
+        />
+      </view>
+    </view>
+
+    <view class="td-card chart-card">
+      <view class="chart-header">
+        <view class="chart-title">服藥效率</view>
+        <view class="chart-subtitle">各時段完成與待改善對比</view>
+      </view>
+      <view class="chart-wrap">
+        <ec-canvas
+          id="periodChart"
+          canvas-id="periodChart"
+          ec="{{periodChart}}"
+          force-use-old-canvas="{{true}}"
+        />
+      </view>
+    </view>
+
+    <view class="td-card chart-card">
+      <view class="chart-header">
+        <view class="chart-title">每週表現</view>
+        <view class="chart-subtitle">每日完成率圓角柱狀圖</view>
+      </view>
+      <view class="chart-wrap">
+        <ec-canvas
+          id="trendChart"
+          canvas-id="trendChart"
+          ec="{{trendChart}}"
+          force-use-old-canvas="{{true}}"
+        />
+      </view>
+    </view>
+
+    <view class="section-title">
+      <t-icon name="chart-pie" size="38rpx" />
+      <text>時段明細</text>
+    </view>
+
+    <t-collapse default-value="{{['morning']}}">
+      <t-collapse-panel header="早上" value="morning">
+        <view class="detail-row">
+          <view class="detail-item success">
+            <text class="detail-label">完成</text>
+            <text class="detail-num">{{periodStats.morning.completed}}</text>
+          </view>
+          <view class="detail-item warning">
+            <text class="detail-label">延遲</text>
+            <text class="detail-num">{{periodStats.morning.delayed}}</text>
+          </view>
+          <view class="detail-item error">
+            <text class="detail-label">漏服</text>
+            <text class="detail-num">{{periodStats.morning.missed}}</text>
+          </view>
+        </view>
+      </t-collapse-panel>
+
+      <t-collapse-panel header="中午" value="noon">
+        <view class="detail-row">
+          <view class="detail-item success">
+            <text class="detail-label">完成</text>
+            <text class="detail-num">{{periodStats.noon.completed}}</text>
+          </view>
+          <view class="detail-item warning">
+            <text class="detail-label">延遲</text>
+            <text class="detail-num">{{periodStats.noon.delayed}}</text>
+          </view>
+          <view class="detail-item error">
+            <text class="detail-label">漏服</text>
+            <text class="detail-num">{{periodStats.noon.missed}}</text>
+          </view>
+        </view>
+      </t-collapse-panel>
+
+      <t-collapse-panel header="晚上" value="evening">
+        <view class="detail-row">
+          <view class="detail-item success">
+            <text class="detail-label">完成</text>
+            <text class="detail-num">{{periodStats.evening.completed}}</text>
+          </view>
+          <view class="detail-item warning">
+            <text class="detail-label">延遲</text>
+            <text class="detail-num">{{periodStats.evening.delayed}}</text>
+          </view>
+          <view class="detail-item error">
+            <text class="detail-label">漏服</text>
+            <text class="detail-num">{{periodStats.evening.missed}}</text>
+          </view>
+        </view>
+      </t-collapse-panel>
+    </t-collapse>
+
+    <view class="section-title">
+      <t-icon name="tips" size="38rpx" />
+      <text>AI 建議</text>
+    </view>
+
+    <view class="td-card advice-card" wx:for="{{aiAdvices}}" wx:key="id">
+      <view class="advice-row">
+        <view class="advice-icon" style="background: {{item.bg}};">
+          <t-icon name="{{item.icon}}" size="40rpx" color="{{item.color}}" />
+        </view>
+        <view class="advice-text">
+          <view class="advice-title">{{item.title}}</view>
+          <view class="advice-desc">{{item.desc}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="action-section">
+      <view class="gradient-btn" bind:tap="exportReport">
+        <t-icon name="download" size="36rpx" color="#FFFFFF" />
+        <text class="gradient-btn-text">匯出報告</text>
+      </view>
+      <view class="outline-btn" bind:tap="shareToDoctor">
+        <t-icon name="share" size="36rpx" color="#5A9BEB" />
+        <text class="outline-btn-text">分享給醫師</text>
+      </view>
+    </view>
+
+    <t-divider content="注意事項" />
+    <view class="footer-note">
+      <text>* AI 建議僅供參考，不能取代醫師診斷。</text>
+      <text>* 圖表數據由本月服藥紀錄計算而來。</text>
+    </view>
+  </view>
+</view>

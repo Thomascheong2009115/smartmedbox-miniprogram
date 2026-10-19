@@ -1,0 +1,135 @@
+.tab-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(110rpx + env(safe-area-inset-bottom));
+  padding: 10rpx 0 env(safe-area-inset-bottom);
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  background: #FFFFFF;
+  border-top: 1rpx solid #F0F0F0;
+  box-shadow: none;
+  z-index: 9999;
+}
+
+.tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 88rpx;
+  padding-bottom: 4rpx;
+  position: relative;
+  gap: 4rpx;
+  transition: transform var(--dur-fast) var(--easing-standard);
+  z-index: 1;
+}
+
+.tab-item:active {
+  transform: translateY(2rpx);
+}
+
+.icon-wrap {
+  width: 84rpx;
+  height: 84rpx;
+  border-radius: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1rpx solid transparent;
+  transition: all 0.2s ease;
+}
+
+.icon-wrap--active {
+  /* background: rgba(59, 130, 246, 0.14); */
+  /* Remove active background per new design, just icon color change */
+  background: transparent;
+  transform: translateY(-2rpx);
+}
+
+.icon-box {
+  width: 56rpx;
+  height: 56rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.tab-text {
+  font-size: 22rpx;
+  line-height: 1;
+  color: #999999;
+  font-weight: 500;
+  z-index: 2;
+}
+
+.active-text {
+  color: #4A90D9;
+  font-weight: 700;
+}
+
+.center-wrapper,
+.mic-wrapper {
+  transform: translateY(0); /* Reset transform */
+  z-index: 10;
+  display: flex;
+  flex-direction: column; /* Ensure vertical stacking */
+  align-items: center;
+  justify-content: flex-end; /* Align bottom to match text */
+  padding-bottom: 4rpx; /* Match other tab items */
+}
+
+/* 底部导航栏中央凸起按钮 */
+.tab-voice-btn {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  background: #4A90D9;
+  position: absolute;
+  top: -50rpx; /* Lift it higher */
+  left: 50%;
+  margin-left: -58rpx; /* Center horizontally: -(100+16)/2 = -58 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 -4rpx 12rpx rgba(0,0,0,0.05); /* Softer shadow */
+  border: 8rpx solid #FFFFFF;
+  z-index: 10;
+  transition: transform 0.1s ease;
+}
+
+/* Adjust wrapper to accommodate absolute button */
+.mic-wrapper {
+  position: relative;
+  overflow: visible;
+  height: 100%;
+}
+
+.mic-wrapper .tab-text {
+  margin-top: 70rpx; /* Push text down further */
+  position: relative;
+  z-index: 1;
+}
+
+.tab-voice-btn:active {
+  transform: scale(0.95);
+}
+
+.center-circle--active {
+   /* Maybe add some active state if needed, but usually just color */
+}
+
+.tab-svg-icon {
+  width: 48rpx;
+  height: 48rpx;
+}
+
+.tab-mic-svg {
+  width: 44rpx;
+  height: 44rpx;
+}

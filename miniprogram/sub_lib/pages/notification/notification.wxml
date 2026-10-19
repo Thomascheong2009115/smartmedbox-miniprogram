@@ -1,0 +1,87 @@
+<!-- pages/notification/notification.wxml -->
+<view class="immersive-header">
+  <view class="status-bar-placeholder"></view>
+  <view class="custom-nav-row">
+    <view class="nav-left" bind:tap="goBack">
+      <t-icon name="chevron-left" size="48rpx" color="#333333" />
+      <text class="nav-title">通知中心</text>
+    </view>
+  </view>
+  <view class="header-curve"></view>
+</view>
+
+<view class="page-container">
+  
+  <!-- 未處理通知 -->
+  <view class="section-title">
+    <t-icon name="notification-filled" size="40rpx" color="#D54941" />
+    <text>未處理警報</text>
+    <t-badge count="{{unreadList.length}}" offset="{{[-6, -6]}}" wx:if="{{unreadList.length > 0}}" />
+  </view>
+
+  <block wx:if="{{unreadList.length > 0}}">
+    <view class="warning-card warning-card--unread" 
+          wx:for="{{unreadList}}" wx:key="id"
+          bind:tap="onTapNotification" data-item="{{item}}">
+      <view class="warning-icon-wrap">
+        <t-icon name="error-circle-filled" size="48rpx" color="#D54941" />
+        <view class="unread-dot"></view>
+      </view>
+      <view class="warning-content">
+        <view class="warning-header">
+            <text class="warning-title">{{item.title}}</text>
+            <text class="warning-time">{{item.timeStr}}</text>
+        </view>
+        <view class="warning-desc">{{item.content}}</view>
+        <view class="warning-hint">點擊查看詳情</view>
+      </view>
+    </view>
+  </block>
+  <block wx:else>
+    <view class="empty-state">
+      <t-icon name="check-circle" size="80rpx" color="#2BA471" />
+      <text class="empty-text">當前沒有新通知</text>
+    </view>
+  </block>
+
+  <!-- 已處理通知 -->
+  <view class="section-title" style="margin-top: 48rpx;">
+    <t-icon name="history" size="40rpx" color="#5C6B77" />
+    <text>已處理通知</text>
+  </view>
+
+  <block wx:if="{{readList.length > 0}}">
+    <view class="warning-card warning-card--read" wx:for="{{readList}}" wx:key="id">
+      <view class="warning-icon-wrap">
+        <t-icon name="check-circle-filled" size="40rpx" color="#8E99A4" />
+      </view>
+      <view class="warning-content">
+        <view class="warning-header">
+            <text class="warning-title">{{item.title}}</text>
+            <text class="warning-time">{{item.timeStr}}</text>
+        </view>
+        <view class="warning-desc">{{item.content}}</view>
+      </view>
+      <!-- 刪除按鈕 -->
+      <view class="delete-btn" catch:tap="onDeleteNotification" data-id="{{item.id}}">
+        <t-icon name="delete" size="36rpx" color="#B0BEC5" />
+      </view>
+    </view>
+  </block>
+  <block wx:else>
+    <view class="empty-state-small">
+      <text class="empty-text">暫無歷史記錄</text>
+    </view>
+  </block>
+
+</view>
+
+<!-- 詳情彈窗 -->
+<t-dialog
+  visible="{{showDetail}}"
+  title="{{currentNotif.title}}"
+  content="{{currentNotif.content}}"
+  confirm-btn="我知道了"
+  bind:confirm="onConfirmRead"
+>
+</t-dialog>

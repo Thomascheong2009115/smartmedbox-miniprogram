@@ -1,0 +1,301 @@
+<view class="page-wrapper">
+  <!-- Top Header -->
+  <view class="immersive-header">
+    <view class="status-bar-placeholder">  <!-- ===== Manual Input Modal ===== -->
+  <view class="custom-modal-mask" wx:if="{{showManualInputModal}}">
+    <view class="custom-modal-card">
+      <view class="modal-header-icon edit">
+        <t-icon name="keyboard" size="48rpx" />
+      </view>
+      <text class="modal-title">手動輸入指令</text>
+
+      <textarea
+        class="modal-textarea"
+        value="{{manualInputText}}"
+        placeholder="例如：提醒伯伯明天早上八點吃兩粒降壓藥"
+        bindinput="onManualInputChange"
+        maxlength="200"
+        fixed="true"
+        focus="{{showManualInputModal}}"
+      ></textarea>
+
+      <view class="modal-footer">
+        <view class="modal-btn cancel" bind:tap="closeManualInput">取消</view>
+        <view class="modal-btn confirm" bind:tap="submitManualInput">發送</view>
+      </view>
+    </view>
+  </view>
+
+</view>
+    <view class="custom-nav-row">
+      <text class="nav-title">醫療顧問</text>
+    </view>
+    <view class="header-curve"></view>
+  </view>
+
+  <!-- Assistant Header -->
+  <view class="assistant-header-card">
+    <view class="assistant-header-left">
+      <text class="assistant-label">語音助手</text>
+      <text class="assistant-title" style="width: 458rpx; display: block; box-sizing: border-box">我可以幫你建立服藥提醒</text>
+      <!-- Manual Input Trigger -->
+      <view class="manual-input-trigger" bind:tap="openManualInput">
+        <t-icon name="keyboard" size="24rpx" color="#64748B" />
+        <text>不方便説話？點擊這裏手動輸入</text>
+        <t-icon name="chevron-right" size="24rpx" color="#94A3B8" />
+      </view>
+    </view>
+    <view class="assistant-avatar-wrapper">
+      <view class="assistant-avatar-ring">
+        <view class="assistant-avatar">
+          <image class="assistant-avatar-img" src="/assets/images/ai-doctor.png" mode="aspectFill" />
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Conversation & Mic Section -->
+  <view class="voice-main">
+    <!-- Suggested commands -->
+    <view class="suggestion-list">
+      <view class="suggestion-chip">
+        <t-icon name="bulletpoint" size="28rpx" color="#64748B" />
+        <text>提醒下一次服藥</text>
+      </view>
+      <view class="suggestion-chip">
+        <t-icon name="bulletpoint" size="28rpx" color="#64748B" />
+        <text>查詢今日藥盒狀態</text>
+      </view>
+      <view class="suggestion-chip">
+        <t-icon name="bulletpoint" size="28rpx" color="#64748B" />
+        <text>延後 30 分鐘提醒</text>
+      </view>
+    </view>
+
+    <!-- AI Hero -->
+    <view class="hero-section">
+      <!-- <view class="hero-card">
+        <image class="ai-doctor-hero {{isRecording ? 'ai-doctor-hero--listening' : ''}}" src="/assets/images/1.jpg" mode="aspectFit" />
+        <view class="hero-overlay">医疗顾问</view>
+      </view>
+      <text class="hero-caption">医疗顾问</text> -->
+
+      <view class="speech-bubble" wx:if="{{isRecording}}">
+        <text class="speech-text">我在聆听，请继续说…</text>
+      </view>
+      <view class="speech-bubble" wx:if="{{!isRecording && lastCommand}}">
+        <text class="speech-text">{{lastCommand}}</text>
+      </view>
+    </view>
+
+    <!-- ★ Central Record Button (CHANGED: t-icon → SVG image) -->
+    <view class="record-btn-container">
+      <view
+        class="voice-btn-wrapper {{isRecording ? 'recording' : ''}}"
+        bind:touchstart="startRecord"
+        bind:touchend="stopRecord"
+      >
+        <view class="voice-btn-ring ring-1"></view>
+        <view class="voice-btn-ring ring-2"></view>
+        <view class="voice-btn-ring ring-3"></view>
+        <view class="voice-btn-core">
+          <!-- ★ 原来是 <t-icon name="microphone" size="64rpx" color="#FFFFFF" /> -->
+          <image style="width: 99rpx; height: 85rpx; display: block; box-sizing: border-box" class="mic-svg-icon" src="/assets/icons/mic-white.svg" mode="aspectFit" />
+        </view>
+      </view>
+      <text class="record-hint">{{isRecording ? '正在录音…' : '按住说话'}}</text>
+      <text class="record-subhint">我會自動轉成文字並生成用藥建議</text>
+    </view>
+
+    <!-- ===== Main Content ===== -->
+    <view class="main-content">
+      <!-- Section Header -->
+      <view class="section-header">
+        <t-icon name="folder-open" size="36rpx" color="#1F2937" />
+        <text class="section-title">語音庫</text>
+        <view class="count-badge">{{savedVoices.length}}</view>
+      </view>
+
+      <!-- Voice List -->
+      <view class="voice-list" wx:if="{{savedVoices.length > 0}}">
+        <view
+          class="voice-card {{item.id === currentVoiceId ? 'active' : ''}}"
+          wx:for="{{savedVoices}}"
+          wx:key="id"
+        >
+          <view class="voice-header">
+            <view class="voice-icon-box {{item.id === currentVoiceId ? 'active' : ''}}">
+              <t-icon
+                name="sound"
+                size="40rpx"
+                color="{{item.id === currentVoiceId ? '#FFFFFF' : '#6EAFF8'}}"
+              />
+            </view>
+            <view class="voice-info">
+              <text class="voice-name">语音记录 {{index + 1}}</text>
+              <text class="voice-time">{{item.createTime}}</text>
+            </view>
+            <view class="status-badge" wx:if="{{item.id === currentVoiceId}}">
+              <t-icon name="check" size="24rpx" color="#FFFFFF" />
+              <text>使用中</text>
+            </view>
+          </view>
+
+          <view class="transcript-box" wx:if="{{item.transcriptText}}">
+            <t-icon name="chat" size="32rpx" color="#94A3B8" style="margin-top: 4rpx;" />
+            <text class="transcript-text">{{item.transcriptText}}</text>
+          </view>
+
+          <view class="action-row">
+            <!-- Play Button -->
+            <view
+              class="action-btn btn-primary"
+              bind:tap="playSavedVoice"
+              data-index="{{index}}"
+              wx:if="{{!item.isModified}}"
+            >
+              <t-icon name="play-circle" size="32rpx" />
+              <text>播放</text>
+            </view>
+
+            <!-- Rerecord Button -->
+            <view
+              class="action-btn btn-warning"
+              bind:tap="rerecordVoice"
+              data-index="{{index}}"
+              wx:else
+            >
+              <t-icon name="microphone" size="32rpx" />
+              <text>重录</text>
+            </view>
+
+            <!-- Edit Button -->
+            <view class="action-btn btn-primary" bind:tap="onEditVoice" data-index="{{index}}">
+              <t-icon name="edit-1" size="32rpx" />
+              <text>编辑</text>
+            </view>
+
+            <!-- Set as Reminder Button -->
+            <view
+              class="action-btn btn-set"
+              wx:if="{{item.id !== currentVoiceId}}"
+              bind:tap="setAsReminderVoice"
+              data-id="{{item.id}}"
+            >
+              <t-icon name="setting" size="32rpx" />
+              <text>设为提醒</text>
+            </view>
+
+            <!-- Delete Button -->
+            <view class="action-btn btn-danger" bind:tap="deleteVoice" data-index="{{index}}">
+              <t-icon name="delete" size="32rpx" />
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- Empty State -->
+      <view class="empty-state" wx:else>
+        <t-icon name="folder-open" size="96rpx" color="#CBD5E1" />
+        <text class="empty-text">還沒有錄音，開始錄製你的提醒吧。</text>
+      </view>
+
+      <!-- Tips Card -->
+      <view class="tips-card">
+        <view class="tips-header">
+          <t-icon name="tips" size="32rpx" color="#F97316" />
+          <text class="tips-title">使用小技巧</text>
+        </view>
+        <view class="tips-content">
+          <text class="tip-item">1. 説出例如"提醒伯伯明天晚上九點服藥"。</text>
+          <text class="tip-item">2. 錄音轉成文字後可手動編輯修改。</text>
+          <text class="tip-item">3. 修改語音庫中的文字資訊後可以重新錄製提示播放錄音。</text>
+          <text class="tip-item">4. 可位於藥盒頁面手動管理用藥。</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== Edit Modal ===== -->
+  <view class="custom-modal-mask" wx:if="{{showEditDialog}}">
+    <view class="custom-modal-card">
+      <view class="modal-header-icon edit">
+        <t-icon name="edit-1" size="48rpx" />
+      </view>
+      <text class="modal-title">编辑语音内容</text>
+
+      <textarea
+        class="modal-textarea"
+        value="{{tempTranscript}}"
+        placeholder="请输入要修改的内容"
+        bindinput="onTranscriptChange"
+        maxlength="200"
+        fixed="true"
+      ></textarea>
+
+      <view class="dialog-hint">修改后会同步更新为新的提醒内容。</view>
+
+      <view class="modal-footer">
+        <view class="modal-btn cancel" bind:tap="onEditCancel">取消</view>
+        <view class="modal-btn confirm" bind:tap="onEditConfirm">保存</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== Rerecord Modal ===== -->
+  <view class="custom-modal-mask" wx:if="{{showRerecordModal}}">
+    <view class="custom-modal-card">
+      <view class="modal-header-icon record {{isRerecording ? 'recording' : ''}}">
+        <t-icon name="microphone" size="48rpx" />
+      </view>
+      <text class="modal-title">{{isRerecording ? '重新录音中...' : '准备重新录音'}}</text>
+
+      <text class="modal-content-text">{{isRerecording ? ('已录 ' + rerecordDuration + ' 秒') : '点击开始重新录音'}}</text>
+
+      <view class="modal-footer">
+        <view class="modal-btn cancel" bind:tap="closeRerecordModal">取消</view>
+
+        <view
+          class="modal-btn record-action"
+          bind:tap="stopRerecord"
+          wx:if="{{isRerecording}}"
+        >
+          完成
+        </view>
+        <view
+          class="modal-btn confirm"
+          bind:tap="startRerecord"
+          wx:else
+        >
+          开始录音
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== Confirm Voice Modal (New) ===== -->
+  <view class="custom-modal-mask" wx:if="{{showConfirmModal}}">
+    <view class="custom-modal-card">
+      <view class="modal-header-icon success">
+        <t-icon name="check-circle" size="48rpx" color="#FFFFFF" />
+      </view>
+      <text class="modal-title">确认语音内容</text>
+
+      <textarea
+        class="modal-textarea"
+        value="{{finalText}}"
+        placeholder="请确认内容..."
+        bindinput="onVoiceTextChange"
+        maxlength="200"
+        fixed="true"
+      ></textarea>
+
+      <view class="dialog-hint">确认后将套用为新的用药提醒。</view>
+
+      <view class="modal-footer">
+        <view class="modal-btn cancel" bind:tap="onCancelVoice">取消</view>
+        <view class="modal-btn confirm" bind:tap="onConfirmVoice">确认</view>
+      </view>
+    </view>
+  </view>
+</view>
